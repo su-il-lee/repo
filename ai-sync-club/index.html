@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI싱크클럽 — 함께 배우고, 함께 성장하는 AI 커뮤니티</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0d1117;
+      --deep:   #111827;
+      --card:   #1a2236;
+      --border: rgba(99,102,241,0.2);
+      --indigo: #6366f1;
+      --violet: #8b5cf6;
+      --cyan:   #22d3ee;
+      --text:   #e2e8f0;
+      --muted:  #94a3b8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%;
+      height: 64px;
+      background: rgba(13,17,23,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-size: 1.15rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--indigo), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+    }
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      padding: 0.45rem 1.2rem;
+      background: linear-gradient(135deg, var(--indigo), var(--violet));
+      color: #fff; border: none; border-radius: 8px;
+      font-family: inherit; font-size: 0.88rem; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .nav-cta:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center;
+      padding: 120px 5% 80px;
+      position: relative; overflow: hidden;
+    }
+    #hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 55% at 50% 30%, rgba(99,102,241,0.18) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 20% 80%, rgba(139,92,246,0.12) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 80% 70%, rgba(34,211,238,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.35rem 1rem;
+      background: rgba(99,102,241,0.12);
+      border: 1px solid rgba(99,102,241,0.35);
+      border-radius: 999px;
+      font-size: 0.8rem; color: #a5b4fc;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.03em;
+    }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(1.4); }
+    }
+    h1 {
+      font-size: clamp(2.4rem, 6vw, 4.2rem);
+      font-weight: 900; line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.25rem;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--indigo) 0%, var(--cyan) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      color: var(--muted); max-width: 540px;
+      margin: 0 auto 2.5rem;
+    }
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+    .btn-primary {
+      padding: 0.85rem 2.2rem;
+      background: linear-gradient(135deg, var(--indigo), var(--violet));
+      color: #fff; border: none; border-radius: 10px;
+      font-family: inherit; font-size: 1rem; font-weight: 600;
+      cursor: pointer; text-decoration: none;
+      box-shadow: 0 4px 24px rgba(99,102,241,0.35);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(99,102,241,0.5); }
+    .btn-secondary {
+      padding: 0.85rem 2.2rem;
+      background: transparent;
+      color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit; font-size: 1rem; font-weight: 500;
+      cursor: pointer; text-decoration: none;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.04); border-color: rgba(99,102,241,0.5); }
+
+    .hero-stats {
+      display: flex; gap: 3rem; flex-wrap: wrap;
+      justify-content: center; margin-top: 4rem;
+    }
+    .stat { text-align: center; }
+    .stat-num {
+      font-size: 2rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--indigo), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.15rem; }
+
+    /* ── SECTION COMMONS ── */
+    section { padding: 96px 5%; }
+    .section-tag {
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--indigo);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 800; letter-spacing: -0.02em;
+      margin-bottom: 1rem;
+    }
+    .section-desc {
+      color: var(--muted); font-size: 1rem;
+      max-width: 560px; margin: 0 auto;
+    }
+    .center { text-align: center; }
+
+    /* fade-in on scroll */
+    .reveal {
+      opacity: 0; transform: translateY(28px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── ABOUT ── */
+    #about { background: var(--deep); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .about-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: border-color 0.25s, transform 0.2s;
+    }
+    .about-card:hover { border-color: rgba(99,102,241,0.5); transform: translateY(-4px); }
+    .about-icon {
+      font-size: 2rem; margin-bottom: 1rem;
+      display: block;
+    }
+    .about-card h3 {
+      font-size: 1.05rem; font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+    .about-card p { font-size: 0.9rem; color: var(--muted); }
+
+    /* ── FEATURES ── */
+    #features {}
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 1.8rem;
+      position: relative; overflow: hidden;
+      transition: border-color 0.25s, transform 0.2s;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--indigo), var(--cyan));
+      opacity: 0; transition: opacity 0.25s;
+    }
+    .feature-card:hover { border-color: rgba(99,102,241,0.5); transform: translateY(-4px); }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-num {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em;
+      color: var(--indigo); margin-bottom: 1rem;
+    }
+    .feature-card h3 {
+      font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem;
+    }
+    .feature-card p { font-size: 0.9rem; color: var(--muted); }
+    .feature-tag-list {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1.2rem;
+    }
+    .tag {
+      font-size: 0.72rem; padding: 0.25rem 0.65rem;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 999px; color: #a5b4fc;
+    }
+
+    /* ── JOIN ── */
+    #join { background: var(--deep); }
+    .steps {
+      display: flex; flex-direction: column; gap: 0;
+      max-width: 680px; margin: 3rem auto 0;
+      position: relative;
+    }
+    .steps::before {
+      content: '';
+      position: absolute; left: 26px; top: 0; bottom: 0; width: 2px;
+      background: linear-gradient(to bottom, var(--indigo), var(--violet), var(--cyan));
+      opacity: 0.4;
+    }
+    .step {
+      display: flex; gap: 1.5rem; align-items: flex-start;
+      padding: 1.6rem 0;
+    }
+    .step-circle {
+      flex-shrink: 0;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--indigo), var(--violet));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.1rem;
+      box-shadow: 0 0 0 4px rgba(99,102,241,0.15);
+      position: relative; z-index: 1;
+    }
+    .step-body h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .step-body p  { font-size: 0.88rem; color: var(--muted); }
+
+    /* ── CTA BANNER ── */
+    #cta {
+      padding: 80px 5%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cta-box {
+      width: 100%; max-width: 780px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.18), rgba(139,92,246,0.12));
+      border: 1px solid rgba(99,102,241,0.3);
+      border-radius: 24px;
+      padding: 3.5rem 2.5rem;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-box::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, rgba(99,102,241,0.4), rgba(34,211,238,0.2));
+      z-index: -1;
+      opacity: 0.5;
+    }
+    .cta-box h2 {
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      font-weight: 800; margin-bottom: 1rem;
+    }
+    .cta-box p { color: var(--muted); margin-bottom: 2rem; }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-logo {
+      font-size: 1rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--indigo), var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .footer-copy { font-size: 0.8rem; color: var(--muted); }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a {
+      font-size: 0.8rem; color: var(--muted);
+      text-decoration: none; transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+      .hero-stats { gap: 2rem; }
+      .steps::before { left: 24px; }
+      footer { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">⚡ AI싱크클럽</span>
+  <ul class="nav-links">
+    <li><a href="#about">소개</a></li>
+    <li><a href="#features">활동</a></li>
+    <li><a href="#join">참여방법</a></li>
+  </ul>
+  <a href="#join" class="nav-cta">지금 참여하기</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="badge"><span class="badge-dot"></span> 2025년 가장 핫한 AI 커뮤니티</div>
+  <h1>AI를 함께 배우고,<br /><span class="gradient-text">함께 성장합니다</span></h1>
+  <p class="hero-sub">AI싱크클럽은 최신 AI 트렌드를 공유하고, 실무에 직접 적용하는 방법을 함께 탐구하는 학습 커뮤니티입니다.</p>
+  <div class="hero-btns">
+    <a href="#join" class="btn-primary">지금 참여하기 →</a>
+    <a href="#features" class="btn-secondary">활동 살펴보기</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">120+</div>
+      <div class="stat-label">활동 멤버</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">48+</div>
+      <div class="stat-label">세션 진행</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">30+</div>
+      <div class="stat-label">프로젝트</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="center reveal">
+    <div class="section-tag">About Us</div>
+    <h2 class="section-title">AI싱크클럽이란?</h2>
+    <p class="section-desc">직장인, 학생, 개발자, 기획자 — 직군을 넘어 AI에 관심 있는 누구나 함께합니다.</p>
+  </div>
+  <div class="about-grid">
+    <div class="about-card reveal">
+      <span class="about-icon">🤝</span>
+      <h3>수평적 학습 문화</h3>
+      <p>직급이나 배경에 상관없이, AI를 배우고 싶은 마음 하나로 동등하게 참여하는 열린 커뮤니티입니다.</p>
+    </div>
+    <div class="about-card reveal">
+      <span class="about-icon">⚡</span>
+      <h3>빠른 트렌드 공유</h3>
+      <p>매주 업데이트되는 AI 뉴스와 논문을 쉽게 풀어내고, 실무에 어떻게 적용할지 함께 토론합니다.</p>
+    </div>
+    <div class="about-card reveal">
+      <span class="about-icon">🛠️</span>
+      <h3>실습 중심 프로젝트</h3>
+      <p>이론에서 그치지 않고, 직접 만들고 배포하는 프로젝트를 통해 진짜 실력을 쌓습니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="center reveal">
+    <div class="section-tag">Activities</div>
+    <h2 class="section-title">무엇을 함께하나요?</h2>
+    <p class="section-desc">정기 모임부터 자율 프로젝트까지, 다양한 방식으로 성장할 수 있습니다.</p>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <div class="feature-num">01 — 트렌드 세션</div>
+      <h3>AI 뉴스 & 논문 리뷰</h3>
+      <p>매주 주목할 AI 발표와 논문을 멤버들이 돌아가며 발표합니다. 복잡한 내용을 쉽게 요약하고 인사이트를 나눕니다.</p>
+      <div class="feature-tag-list">
+        <span class="tag">GPT</span>
+        <span class="tag">Gemini</span>
+        <span class="tag">오픈소스 LLM</span>
+        <span class="tag">논문 리뷰</span>
+      </div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-num">02 — 핸즈온 스터디</div>
+      <h3>실전 AI 실습</h3>
+      <p>Claude API, LangChain, RAG, 파인튜닝 등 실무에서 쓰이는 기술을 직접 코딩하며 익힙니다.</p>
+      <div class="feature-tag-list">
+        <span class="tag">Claude API</span>
+        <span class="tag">LangChain</span>
+        <span class="tag">RAG</span>
+        <span class="tag">Python</span>
+      </div>
+    </div>
+    <div class="feature-card reveal">
+      <div class="feature-num">03 — 미니 해커톤</div>
+      <h3>팀 프로젝트 & 데모</h3>
+      <p>분기마다 소규모 팀을 구성해 AI 기반 미니 프로젝트를 완성하고 데모 데이를 진행합니다.</p>
+      <div class="feature-tag-list">
+        <span class="tag">팀빌딩</span>
+        <span class="tag">데모데이</span>
+        <span class="tag">포트폴리오</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN -->
+<section id="join">
+  <div class="center reveal">
+    <div class="section-tag">How to Join</div>
+    <h2 class="section-title">참여 방법</h2>
+    <p class="section-desc">3단계로 간단하게 AI싱크클럽의 일원이 되세요.</p>
+  </div>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-circle">1</div>
+      <div class="step-body">
+        <h3>신청서 제출</h3>
+        <p>아래 버튼을 클릭해 간단한 신청서를 작성합니다. AI에 대한 관심과 배우고 싶은 내용을 자유롭게 적어주세요.</p>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="step-circle">2</div>
+      <div class="step-body">
+        <h3>오리엔테이션 참여</h3>
+        <p>매월 첫째 주에 온라인 오리엔테이션이 진행됩니다. 클럽 소개와 함께 멤버들과 처음 인사를 나눕니다.</p>
+      </div>
+    </div>
+    <div class="step reveal">
+      <div class="step-circle">3</div>
+      <div class="step-body">
+        <h3>정식 멤버로 활동 시작</h3>
+        <p>슬랙 채널 초대와 함께 정식 멤버가 됩니다. 바로 다음 세션부터 참여할 수 있습니다!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section id="cta">
+  <div class="cta-box reveal">
+    <h2>지금 바로 <span class="gradient-text">AI싱크클럽</span>에 합류하세요</h2>
+    <p>AI의 흐름을 놓치지 않고, 함께 성장할 동료를 만나보세요.</p>
+    <a href="mailto:contact@ai-sync-club.kr" class="btn-primary">신청하기 →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <span class="footer-logo">⚡ AI싱크클럽</span>
+  <div class="footer-links">
+    <a href="#">이메일 문의</a>
+    <a href="#">개인정보처리방침</a>
+  </div>
+  <span class="footer-copy">© 2025 AI싱크클럽. All rights reserved.</span>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

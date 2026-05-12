@@ -1,0 +1,39 @@
+# Credentials
+infoU.ini
+InfoU.ini
+
+# Generated CSV exports
+*.csv
+
+# Generated HTML dashboards (timestamped)
+dashboard_*.html
+brand_dashboard_*.html
+
+# Analysis outputs
+analysis.json
+excel_analysis.txt
+brands.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.venv/
+
+# Node.js (todo-next)
+node_modules/
+.next/
+.env.local
+.env*.local
+todo-next/
+todo/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude internal
+.claude/

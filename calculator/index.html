@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(ellipse at 60% 30%, #eeeeff 0%, #f5f5ff 60%, #ffffff 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      perspective: 1000px;
+    }
+
+    /* Ambient light orbs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 400px; height: 400px;
+      background: rgba(91, 91, 214, 0.08);
+      top: 10%; left: 20%;
+    }
+    body::after {
+      width: 300px; height: 300px;
+      background: rgba(124, 124, 248, 0.06);
+      bottom: 10%; right: 20%;
+    }
+
+    .scene {
+      position: relative;
+      z-index: 1;
+      transform: rotateX(4deg) rotateY(-3deg);
+      transform-style: preserve-3d;
+      transition: transform 0.3s ease;
+    }
+
+    .calculator {
+      position: relative;
+      background: linear-gradient(160deg, #ffffff 0%, #f8f8ff 50%, #f0f0fa 100%);
+      border-radius: 20px;
+      padding: 24px;
+      width: 320px;
+
+      /* Top/left highlight edge */
+      border-top: 1px solid rgba(255,255,255,0.9);
+      border-left: 1px solid rgba(255,255,255,0.7);
+      border-right: 1px solid rgba(180,180,210,0.4);
+      border-bottom: 1px solid rgba(180,180,210,0.5);
+
+      /* Layered shadow = depth illusion */
+      box-shadow:
+        0 2px 0 rgba(255,255,255,0.8) inset,
+        0 -1px 0 rgba(200,200,230,0.4) inset,
+        4px 4px 0 #d8d8ee,
+        8px 8px 0 #c8c8e0,
+        12px 12px 0 #b8b8d0,
+        16px 20px 40px rgba(100,100,180,0.18),
+        0 0 60px rgba(91,91,214,0.06);
+    }
+
+    /* Shiny top-left glare */
+    .calculator::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: linear-gradient(135deg,
+        rgba(255,255,255,0.7) 0%,
+        rgba(255,255,255,0.2) 30%,
+        transparent 60%);
+      pointer-events: none;
+    }
+
+    .display {
+      position: relative;
+      background: linear-gradient(180deg, #ebebf8 0%, #f2f2fc 100%);
+      border-radius: 12px;
+      padding: 20px 16px 14px;
+      margin-bottom: 20px;
+      text-align: right;
+      min-height: 88px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+
+      border-top: 1px solid rgba(160,160,210,0.35);
+      border-left: 1px solid rgba(160,160,210,0.25);
+      border-right: 1px solid rgba(255,255,255,0.8);
+      border-bottom: 1px solid rgba(255,255,255,0.9);
+
+      box-shadow:
+        0 4px 16px rgba(100,100,180,0.1) inset,
+        0 1px 0 rgba(255,255,255,0.9);
+    }
+
+    /* Screen scanline texture */
+    .display::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(100,100,180,0.025) 2px,
+        rgba(100,100,180,0.025) 4px
+      );
+      pointer-events: none;
+    }
+
+    .expression {
+      font-size: 13px;
+      color: #9090b8;
+      min-height: 18px;
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      position: relative;
+      z-index: 1;
+    }
+
+    .result {
+      font-size: 36px;
+      font-weight: 300;
+      color: #2a2a6a;
+      letter-spacing: -1px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-shadow: 0 1px 4px rgba(80,80,180,0.15);
+      position: relative;
+      z-index: 1;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 9px;
+    }
+
+    /* 3D button base */
+    button {
+      height: 58px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 400;
+      cursor: pointer;
+      letter-spacing: 0.2px;
+      outline: none;
+      position: relative;
+      transition: transform 0.08s ease, box-shadow 0.08s ease;
+
+      /* Push down effect via translateY + shadow */
+      transform: translateY(-3px);
+    }
+
+    button:hover {
+      transform: translateY(-5px);
+    }
+
+    button:active {
+      transform: translateY(0px) !important;
+    }
+
+    /* Number buttons */
+    .btn-num {
+      background: linear-gradient(160deg, #ffffff 0%, #f5f5ff 100%);
+      color: #333366;
+      border-top: 1px solid rgba(255,255,255,0.95);
+      border-left: 1px solid rgba(255,255,255,0.8);
+      border-right: 1px solid rgba(160,160,210,0.3);
+      border-bottom: 1px solid rgba(160,160,210,0.4);
+      box-shadow:
+        0 3px 0 #c8c8e0,
+        0 6px 12px rgba(100,100,180,0.12),
+        0 1px 0 rgba(255,255,255,0.9) inset;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.8);
+    }
+    .btn-num:hover {
+      background: linear-gradient(160deg, #ffffff 0%, #ededff 100%);
+      box-shadow:
+        0 5px 0 #c8c8e0,
+        0 8px 16px rgba(100,100,180,0.15),
+        0 1px 0 rgba(255,255,255,0.95) inset;
+    }
+    .btn-num:active {
+      box-shadow:
+        0 0px 0 #c8c8e0,
+        0 2px 6px rgba(100,100,180,0.1),
+        0 2px 4px rgba(160,160,210,0.15) inset;
+      background: linear-gradient(160deg, #ebebf8 0%, #e5e5f5 100%);
+    }
+
+    /* Operator buttons */
+    .btn-op {
+      background: linear-gradient(160deg, #eeeeff 0%, #e4e4ff 100%);
+      color: #5555cc;
+      border-top: 1px solid rgba(255,255,255,0.9);
+      border-left: 1px solid rgba(255,255,255,0.7);
+      border-right: 1px solid rgba(120,120,220,0.25);
+      border-bottom: 1px solid rgba(120,120,220,0.35);
+      box-shadow:
+        0 3px 0 #b0b0d8,
+        0 6px 14px rgba(80,80,200,0.15),
+        0 1px 0 rgba(255,255,255,0.8) inset;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.6);
+    }
+    .btn-op:hover {
+      background: linear-gradient(160deg, #f0f0ff 0%, #e8e8ff 100%);
+      box-shadow:
+        0 5px 0 #b0b0d8,
+        0 8px 20px rgba(80,80,200,0.2),
+        0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .btn-op:active {
+      box-shadow:
+        0 0px 0 #b0b0d8,
+        0 2px 8px rgba(80,80,200,0.1),
+        0 2px 4px rgba(120,120,220,0.15) inset;
+      background: linear-gradient(160deg, #dcdcf8 0%, #d8d8f5 100%);
+    }
+
+    /* Function buttons */
+    .btn-fn {
+      background: linear-gradient(160deg, #f8f8ff 0%, #efeffa 100%);
+      color: #7777aa;
+      font-size: 14px;
+      border-top: 1px solid rgba(255,255,255,0.9);
+      border-left: 1px solid rgba(255,255,255,0.7);
+      border-right: 1px solid rgba(150,150,210,0.25);
+      border-bottom: 1px solid rgba(150,150,210,0.35);
+      box-shadow:
+        0 3px 0 #c0c0d8,
+        0 6px 12px rgba(100,100,180,0.1),
+        0 1px 0 rgba(255,255,255,0.85) inset;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.7);
+    }
+    .btn-fn:hover {
+      background: linear-gradient(160deg, #ffffff 0%, #f5f5ff 100%);
+      box-shadow:
+        0 5px 0 #c0c0d8,
+        0 8px 16px rgba(100,100,180,0.13),
+        0 1px 0 rgba(255,255,255,0.9) inset;
+    }
+    .btn-fn:active {
+      box-shadow:
+        0 0px 0 #c0c0d8,
+        0 2px 6px rgba(100,100,180,0.08),
+        0 2px 4px rgba(150,150,210,0.12) inset;
+      background: linear-gradient(160deg, #e8e8f5 0%, #e4e4f0 100%);
+    }
+
+    /* Equals button */
+    .btn-eq {
+      background: linear-gradient(160deg, #7070e8 0%, #5050c8 60%, #4040b0 100%);
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 300;
+      border-top: 1px solid rgba(255,255,255,0.4);
+      border-left: 1px solid rgba(255,255,255,0.25);
+      border-right: 1px solid rgba(0,0,0,0.15);
+      border-bottom: 1px solid rgba(0,0,0,0.2);
+      box-shadow:
+        0 3px 0 #3030a0,
+        0 6px 20px rgba(80,80,200,0.35),
+        0 1px 0 rgba(255,255,255,0.25) inset;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .btn-eq:hover {
+      background: linear-gradient(160deg, #8080f0 0%, #6060d8 60%, #5050c0 100%);
+      box-shadow:
+        0 5px 0 #3030a0,
+        0 8px 28px rgba(80,80,200,0.45),
+        0 1px 0 rgba(255,255,255,0.3) inset;
+    }
+    .btn-eq:active {
+      box-shadow:
+        0 0px 0 #3030a0,
+        0 2px 10px rgba(80,80,200,0.3),
+        0 2px 4px rgba(0,0,0,0.15) inset;
+      background: linear-gradient(160deg, #5050c8 0%, #4040a8 100%);
+    }
+
+    .span2 {
+      grid-column: span 2;
+      text-align: left;
+      padding-left: 22px;
+    }
+  </style>
+</head>
+<body>
+  <div class="scene" id="scene">
+    <div class="calculator">
+      <div class="display">
+        <div class="expression" id="expression"></div>
+        <div class="result" id="result">0</div>
+      </div>
+      <div class="buttons">
+        <!-- Row 1 -->
+        <button class="btn-fn" onclick="clearAll()">AC</button>
+        <button class="btn-fn" onclick="toggleSign()">+/−</button>
+        <button class="btn-fn" onclick="percent()">%</button>
+        <button class="btn-op" onclick="setOp('÷')">÷</button>
+        <!-- Row 2 -->
+        <button class="btn-num" onclick="input('7')">7</button>
+        <button class="btn-num" onclick="input('8')">8</button>
+        <button class="btn-num" onclick="input('9')">9</button>
+        <button class="btn-op" onclick="setOp('×')">×</button>
+        <!-- Row 3 -->
+        <button class="btn-num" onclick="input('4')">4</button>
+        <button class="btn-num" onclick="input('5')">5</button>
+        <button class="btn-num" onclick="input('6')">6</button>
+        <button class="btn-op" onclick="setOp('−')">−</button>
+        <!-- Row 4 -->
+        <button class="btn-num" onclick="input('1')">1</button>
+        <button class="btn-num" onclick="input('2')">2</button>
+        <button class="btn-num" onclick="input('3')">3</button>
+        <button class="btn-op" onclick="setOp('+')">+</button>
+        <!-- Row 5 -->
+        <button class="btn-num span2" onclick="input('0')">0</button>
+        <button class="btn-num" onclick="inputDot()">.</button>
+        <button class="btn-eq" onclick="calculate()">=</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 3D tilt on mouse move — lerp smoothing
+    const scene = document.getElementById('scene');
+    let targetX = 4, targetY = -3;
+    let currentX = 4, currentY = -3;
+    const LERP = 0.06;
+
+    document.addEventListener('mousemove', e => {
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight / 2;
+      const dx = (e.clientX - cx) / cx;
+      const dy = (e.clientY - cy) / cy;
+      targetX = 4 - dy * 6;
+      targetY = -3 + dx * 6;
+    });
+    document.addEventListener('mouseleave', () => {
+      targetX = 4;
+      targetY = -3;
+    });
+
+    (function animate() {
+      currentX += (targetX - currentX) * LERP;
+      currentY += (targetY - currentY) * LERP;
+      scene.style.transform = `rotateX(${currentX}deg) rotateY(${currentY}deg)`;
+      requestAnimationFrame(animate);
+    })();
+
+    // Calculator logic
+    let current = '0';
+    let previous = null;
+    let operator = null;
+    let newInput = false;
+
+    const resultEl = document.getElementById('result');
+    const exprEl = document.getElementById('expression');
+
+    function updateDisplay() {
+      resultEl.textContent = current;
+    }
+
+    function input(digit) {
+      if (newInput) { current = digit; newInput = false; }
+      else current = current === '0' ? digit : current + digit;
+      if (current.length > 12) current = current.slice(0, 12);
+      updateDisplay();
+    }
+
+    function inputDot() {
+      if (newInput) { current = '0.'; newInput = false; return updateDisplay(); }
+      if (!current.includes('.')) current += '.';
+      updateDisplay();
+    }
+
+    function setOp(op) {
+      if (operator && !newInput) calculate(true);
+      previous = parseFloat(current);
+      operator = op;
+      newInput = true;
+      exprEl.textContent = `${previous} ${op}`;
+    }
+
+    function calculate(chain = false) {
+      if (operator === null || previous === null) return;
+      const curr = parseFloat(current);
+      let result;
+      switch (operator) {
+        case '+': result = previous + curr; break;
+        case '−': result = previous - curr; break;
+        case '×': result = previous * curr; break;
+        case '÷': result = curr !== 0 ? previous / curr : 'Error'; break;
+      }
+      if (!chain) {
+        exprEl.textContent = `${previous} ${operator} ${curr} =`;
+        operator = null;
+        previous = null;
+      }
+      current = result === 'Error' ? 'Error' : String(parseFloat(result.toFixed(10)));
+      newInput = true;
+      updateDisplay();
+    }
+
+    function clearAll() {
+      current = '0'; previous = null; operator = null; newInput = false;
+      exprEl.textContent = '';
+      updateDisplay();
+    }
+
+    function toggleSign() {
+      if (current === '0' || current === 'Error') return;
+      current = current.startsWith('-') ? current.slice(1) : '-' + current;
+      updateDisplay();
+    }
+
+    function percent() {
+      current = String(parseFloat(current) / 100);
+      updateDisplay();
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key >= '0' && e.key <= '9') input(e.key);
+      else if (e.key === '.') inputDot();
+      else if (e.key === '+') setOp('+');
+      else if (e.key === '-') setOp('−');
+      else if (e.key === '*') setOp('×');
+      else if (e.key === '/') { e.preventDefault(); setOp('÷'); }
+      else if (e.key === 'Enter' || e.key === '=') calculate();
+      else if (e.key === 'Escape') clearAll();
+      else if (e.key === 'Backspace') {
+        if (current.length > 1) current = current.slice(0, -1);
+        else current = '0';
+        updateDisplay();
+      }
+    });
+  </script>
+</body>
+</html>
